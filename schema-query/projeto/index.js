@@ -21,23 +21,42 @@ const usuarios = [
     }
 ]
 
+const perfis = [
+    {
+        id:1,
+        nome:'Comum'
+    },
+    {
+        id:2,
+        nome:'Administrador'
+    }
+]
+
 const typeDefs = gql`
     #esto cria un tipo Dare como puede crear otros
     scalar Date
+
+    type Perfil{
+        id:Int
+        nome:String!
+    }
+
     type Usuario {
-        id:ID!
+        id:Int
         nome:String!
         email:String!
         idade:Int
         salario:Float
         vip:Boolean
     }
+
     type Produto {
         nome:String!
         preco:Float!
         desconto:Float
         precoComDesconto:Float
     }
+
     # Pontos de entrada da sua API!
     type Query{
         ola:String!
@@ -46,6 +65,9 @@ const typeDefs = gql`
         produtoEmDestaque:Produto
         numerosMegaSena:[Int!]!
         usuarios:[Usuario]
+        usuario(id:Int):Usuario
+        perfis:[Perfil]
+        perfilById(id:Int):Perfil
     }
 `
 
@@ -99,14 +121,30 @@ const resolvers = {
         },
         
         numerosMegaSena(){
-            //return[4,8,13,27,33,54]
+            //return[4,8,13,27,33,54] retorna un array
             const crescente = (a ,b) => a - b
 
             return Array(6).fill(0).map( n => parseInt(Math.random() * 60 + 1)).sort(crescente)
         },
         
         usuarios(){
+            //retorna un array
             return usuarios
+        },
+        // procura por id
+        // {id} = esto es destructuring una forma de entrar directo ala variable del objeto 
+        usuario(_, {id}) {
+            const seleccionados = usuarios.filter(u => u.id === id)
+            return seleccionados ? seleccionados[0] : null
+        },
+
+        perfis(){
+            return perfis
+        },
+        
+        perfilById(_, args){
+            const perfiles = perfis.filter(p => p.id === args.id)
+            return perfiles ? perfiles[0] : null
         }
     
     }
